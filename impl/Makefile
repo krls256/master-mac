@@ -68,6 +68,10 @@ lockerI-verbose: $(LOCKER_OBJS_VERBOSE) $(LIB_OBJS) | folders
 	@echo -e "\n### Compiling LOCKER-I (verbose mode)\n"
 	$(CC) $(CFLAGS) $(MAIN_LOCKER) $(addprefix $(BUILD)/, $^) $(INCLUDE) $(LIB) -D VERBOSE -o $(BIN)/$@
 
+build-raw:
+	g++ -O2 -pedantic -Wall -Wextra -Wno-vla  src/main_locker.cpp \
+	bin/build/ffi_field.o bin/build/ffi_elt.o bin/build/ffi_vec.o bin/build/parsing.o bin/build/decoder.o bin/build/kem.o bin/build/hash.o bin/build/rng.o \
+	 -I src -I src/ffi -lntl -lgmp -I lib/hash -lcrypto -I lib/rng -o bin/lockerI
 
 
 clean:
