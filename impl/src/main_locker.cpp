@@ -3,22 +3,28 @@
 #include "rng.h"
 #include "ffi_field.h"
 #include "ffi_vec.h"
+#include <iostream>
+#include <iomanip>
+
+void print_block_space() {
+  printf("\n==========================================================================================================\n");
+}
+
+template <size_t N>
+void print_hex(unsigned char (&bts)[N], std::string input) {
+  std::cout << std::endl << input << std::endl;
+  for(unsigned long i = 0 ; i < N ; i++) std::cout << std::setfill('0') << std::setw(2) << std::uppercase << std::hex << (0xFF & bts[i]);
+  print_block_space();
+}
 
 int main() {
-
-  printf("\n");
-  printf("*************************\n");
-  printf("******** LOCKER-I *******\n");
-  printf("*************************\n");
-
-  printf("\n");
   printf("M: %d   ", PARAM_M);
   printf("N: %d   ", PARAM_N);
   printf("D: %d   ", PARAM_D);
   printf("R: %d   ", PARAM_R);
-  printf("\n\nSecurity: %d bits", PARAM_SECURITY);
+  printf("\nSecurity: %d bits", PARAM_SECURITY);
   printf("\nFailure rate: 2^-%d\n", PARAM_DFR);
-  printf("\n");
+  printf("Demo:\n");
 
   unsigned char pk[PUBLIC_KEY_BYTES];
   unsigned char sk[SECRET_KEY_BYTES];
@@ -27,26 +33,23 @@ int main() {
   unsigned char ss1[SHARED_SECRET_BYTES];
   unsigned char ss2[SHARED_SECRET_BYTES];
 
-  printf("\n\npublic before gen: ");
-  for(int i = 0 ; i < PUBLIC_KEY_BYTES ; ++i) printf("%02x", pk[i]);
-  printf("\n\nprivate before gen: ");
-  for(int i = 0 ; i < SECRET_KEY_BYTES ; ++i) printf("%02x", sk[i]);
+  print_hex(pk, "public before gen:");
+  print_hex(sk, "private before gen:");
 
   crypto_kem_keypair(pk, sk);
-
-  printf("\n\npublic after gen: ");
-  for(int i = 0 ; i < PUBLIC_KEY_BYTES ; ++i) printf("%02x", pk[i]);
-  printf("\n\nprivate after gen: ");
-  for(int i = 0 ; i < SECRET_KEY_BYTES ; ++i) printf("%02x", sk[i]);
-
+  print_hex(pk, "public after gen:");
+  print_hex(sk, "private after gen:");
+  print_hex(ct, "cypher text:");
+  print_hex(ss1, "secret token 1:");
+  print_hex(ss2, "secret token 2:");
 
   crypto_kem_enc(ct, ss1, pk);
+  print_hex(ct, "cypher text after enc:");
+  print_hex(ss1, "secret token 1 after enc:");
+  print_hex(ss2, "secret token 2 after enc:");
+
   crypto_kem_dec(ss2, ct, sk);
-
-  printf("\n\nsecret1: ");
-  for(int i = 0 ; i < SHARED_SECRET_BYTES ; ++i) printf("%02x", ss1[i]);
-
-  printf("\nsecret2: ");
-  for(int i = 0 ; i < SHARED_SECRET_BYTES ; ++i) printf("%02x", ss2[i]);
-  printf("\n\n");
+  print_hex(ct, "cypher text after dec:");
+  print_hex(ss1, "secret token 1 after dec:");
+  print_hex(ss2, "secret token 2 after dec:");
 }
