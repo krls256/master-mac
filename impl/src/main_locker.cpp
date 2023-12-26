@@ -4,7 +4,7 @@
 #include "ffi_field.h"
 #include "ffi_vec.h"
 
-int run() {
+int main() {
 
   printf("\n");
   printf("*************************\n");

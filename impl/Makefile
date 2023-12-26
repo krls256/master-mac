@@ -1,13 +1,13 @@
 
-CC=g++
+CC=clang++
 NO_RNG_WARNING:=-Wno-unused-but-set-variable -Wno-unused-parameter -Wno-sign-compare 
 CFLAGS:=-O2 -pedantic -Wall -Wextra -Wno-vla 
 
-HASH_SRC:=lib/hash/hash.c
-HASH_INCLUDE:=-I lib/hash -lcrypto
+HASH_SRC:=lib/hash/hash.cpp
+HASH_INCLUDE:=-I lib/hash -lcrypto -I /usr/local/include
 
-RNG_SRC:=lib/rng/rng.c
-RNG_INCLUDE:=-I lib/rng
+RNG_SRC:=lib/rng/rng.cpp
+RNG_INCLUDE:=-I lib/rng -I /usr/local/include
 
 FFI_SRC:=src/ffi
 FFI_INCLUDE:=-I src/ffi -lntl -lgmp
@@ -15,8 +15,8 @@ FFI_INCLUDE:=-I src/ffi -lntl -lgmp
 SRC:=src
 INCLUDE:=-I src $(FFI_INCLUDE)
 MAIN_LOCKER:=src/main_locker.cpp
-MAIN_KAT:=src/main_kat.c
-LIB:=$(HASH_INCLUDE) $(RNG_INCLUDE)
+MAIN_KAT:=src/main_kat.cpp
+LIB:=$(HASH_INCLUDE) $(RNG_INCLUDE) -L /usr/local/lib
 
 LOCKER_OBJS:=ffi_field.o ffi_elt.o ffi_vec.o parsing.o decoder.o kem.o 
 LOCKER_OBJS_VERBOSE:=ffi_field.o ffi_elt.o ffi_vec.o parsing.o decoder-verbose.o kem-verbose.o
