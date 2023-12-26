@@ -1,13 +1,13 @@
 
 CC=g++
 NO_RNG_WARNING:=-Wno-unused-but-set-variable -Wno-unused-parameter -Wno-sign-compare 
-CFLAGS:=-O2 -pedantic -Wall -Wextra -Wno-vla -Wc++11-long-long -Wunused-parameter
+CFLAGS:=-O2 -pedantic -Wall -Wextra -Wno-vla -Wno-long-long -Wunused-parameter
 
 HASH_SRC:=lib/hash/hash.cpp
-HASH_INCLUDE:=-I lib/hash -lcrypto -I /usr/local/include
+HASH_INCLUDE:=-I lib/hash -lcrypto
 
 RNG_SRC:=lib/rng/rng.cpp
-RNG_INCLUDE:=-I lib/rng -I /usr/local/include
+RNG_INCLUDE:=-I lib/rng
 
 FFI_SRC:=src/ffi
 FFI_INCLUDE:=-I src/ffi -lntl -lgmp
@@ -16,7 +16,7 @@ SRC:=src
 INCLUDE:=-I src $(FFI_INCLUDE)
 MAIN_LOCKER:=src/main_locker.cpp
 MAIN_KAT:=src/main_kat.cpp
-LIB:=$(HASH_INCLUDE) $(RNG_INCLUDE) -L /usr/local/lib
+LIB:=$(HASH_INCLUDE) $(RNG_INCLUDE)
 
 LOCKER_OBJS:=ffi_field.o ffi_elt.o ffi_vec.o parsing.o decoder.o kem.o 
 LOCKER_OBJS_VERBOSE:=ffi_field.o ffi_elt.o ffi_vec.o parsing.o decoder-verbose.o kem-verbose.o
@@ -64,8 +64,10 @@ lockerI-verbose: $(LOCKER_OBJS_VERBOSE) $(LIB_OBJS) | folders
 	@echo -e "\n### Compiling LOCKER-I (verbose mode)\n"
 	$(CC) $(CFLAGS) $(MAIN_LOCKER) $(addprefix $(BUILD)/, $^) $(INCLUDE) $(LIB) -D VERBOSE -o $(BIN)/$@
 
-build-raw:
-	g++ -O2 -pedantic -Wall -Wextra -Wno-vla -Wc++11-long-long -Wunused-parameter src/main_locker.cpp bin/build/ffi_field.o bin/build/ffi_elt.o bin/build/ffi_vec.o bin/build/parsing.o bin/build/decoder.o bin/build/kem.o bin/build/hash.o bin/build/rng.o -I src -I src/ffi -lntl -lgmp -I lib/hash -lcrypto -I /usr/local/include -I lib/rng -I /usr/local/include -L /usr/local/lib -o bin/lockerI
+docker-build:
+	docker build -t locker .
+docker-run:
+	docker run locker
 
 
 
