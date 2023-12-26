@@ -60,10 +60,6 @@ lockerI: $(LOCKER_OBJS) $(LIB_OBJS) | folders
 	@echo -e "\n### Compiling LOCKER-I\n"
 	$(CC) $(CFLAGS) $(MAIN_LOCKER) $(addprefix $(BUILD)/, $^) $(INCLUDE) $(LIB) -o $(BIN)/$@
 
-lockerI-kat: $(LOCKER_OBJS) $(LIB_OBJS) | folders
-	@echo -e "\n### Compiling LOCKER-I KAT\n"
-	$(CC) $(CFLAGS) $(MAIN_KAT) $(addprefix $(BUILD)/, $^) $(INCLUDE) $(LIB) -o $(BIN)/$@
-
 lockerI-verbose: $(LOCKER_OBJS_VERBOSE) $(LIB_OBJS) | folders
 	@echo -e "\n### Compiling LOCKER-I (verbose mode)\n"
 	$(CC) $(CFLAGS) $(MAIN_LOCKER) $(addprefix $(BUILD)/, $^) $(INCLUDE) $(LIB) -D VERBOSE -o $(BIN)/$@
