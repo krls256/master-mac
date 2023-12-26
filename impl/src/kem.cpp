@@ -67,7 +67,7 @@ int crypto_kem_keypair(unsigned char* pk, unsigned char* sk) {
  * \param[in] pk String containing the public key
  * \return 0 if encapsulation is sucessfull
  */
-int crypto_kem_enc(unsigned char* ct, unsigned char* ss, const unsigned char* pk) {
+int crypto_kem_enc(unsigned char* ss, unsigned char* ct, const unsigned char* pk) {
   ffi_field_init();
   ffi_vec_init_mulmod();
 

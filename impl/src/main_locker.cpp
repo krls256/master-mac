@@ -17,6 +17,17 @@ void print_hex(unsigned char (&bts)[N], std::string input) {
   print_block_space();
 }
 
+const int SEED_SIZE = 48;
+
+void seed() {
+  srand(time(NULL));
+  unsigned char seed[SEED_SIZE];
+  for(unsigned long i = 0 ; i < SEED_SIZE ; i++) seed[i] = std::rand();
+  print_hex(seed, "seed:");
+
+  randombytes_init(seed, NULL, 256);
+}
+
 int main() {
   printf("M: %d   ", PARAM_M);
   printf("N: %d   ", PARAM_N);
@@ -25,6 +36,8 @@ int main() {
   printf("\nSecurity: %d bits", PARAM_SECURITY);
   printf("\nFailure rate: 2^-%d\n", PARAM_DFR);
   printf("Demo:\n");
+
+  seed();
 
   unsigned char pk[PUBLIC_KEY_BYTES];
   unsigned char sk[SECRET_KEY_BYTES];
@@ -43,7 +56,7 @@ int main() {
   print_hex(ss1, "secret token 1:");
   print_hex(ss2, "secret token 2:");
 
-  crypto_kem_enc(ct, ss1, pk);
+  crypto_kem_enc(ss1, ct, pk);
   print_hex(ct, "cypher text after enc:");
   print_hex(ss1, "secret token 1 after enc:");
   print_hex(ss2, "secret token 2 after enc:");
