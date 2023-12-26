@@ -23,10 +23,6 @@
  * \return 0 if keygen is sucessfull
  */
 int crypto_kem_keypair(unsigned char* pk, unsigned char* sk) {
-  #ifdef VERBOSE
-    printf("\n\n\n### KEYGEN ###\n\n");
-  #endif
-
   ffi_field_init();
   ffi_vec_init_mulmod();
 
@@ -57,17 +53,6 @@ int crypto_kem_keypair(unsigned char* pk, unsigned char* sk) {
   locker_public_key_to_string(sk + SEEDEXPANDER_SEED_BYTES, pk_tmp);
   locker_secret_key_to_string(sk, sk_seed);
 
-  #ifdef VERBOSE
-    printf("\n\nsk(seed): "); for(int i = 0 ; i < SEEDEXPANDER_SEED_BYTES ; ++i) printf("%02x", sk_seed[i]);
-    printf("\n\nF: "); ffi_vec_print(sk_tmp.F, PARAM_D);
-    printf("\n\nx: "); ffi_vec_print(sk_tmp.x, PARAM_N);
-    printf("\n\ny: "); ffi_vec_print(sk_tmp.y, PARAM_N);
-
-    printf("\n\nh = x^-1.y: "); ffi_vec_print(pk_tmp.h, PARAM_N);
-
-    printf("\n\npk: "); for(int i = 0 ; i < PUBLIC_KEY_BYTES ; ++i) printf("%02x", pk[i]);
-  #endif
-
   return 0;
 }
 
@@ -83,10 +68,6 @@ int crypto_kem_keypair(unsigned char* pk, unsigned char* sk) {
  * \return 0 if encapsulation is sucessfull
  */
 int crypto_kem_enc(unsigned char* ct, unsigned char* ss, const unsigned char* pk) {
-  #ifdef VERBOSE
-    printf("\n\n\n\n### ENCAPS ###");
-  #endif
-
   ffi_field_init();
   ffi_vec_init_mulmod();
 
@@ -151,19 +132,6 @@ int crypto_kem_enc(unsigned char* ct, unsigned char* ss, const unsigned char* pk
   //Ciphertext parsing
   locker_ciphertext_to_string(ct, c_tmp);
 
-  #ifdef VERBOSE
-    printf("\n\nm: "); for(int i=0 ; i<CRYPTO_BYTES ; i++) printf("%02x", m[i]);
-    printf("\n\ntheta: "); for(int i=0 ; i<SEEDEXPANDER_SEED_BYTES ; i++) printf("%02x", theta[i]);
-    printf("\n\nE: "); ffi_vec_print(E, PARAM_R);
-    printf("\n\nE1: "); ffi_vec_print(polyE1, PARAM_N);
-    printf("\n\nE2: "); ffi_vec_print(polyE2, PARAM_N);
-    printf("\n\nu(syndrom): "); ffi_vec_print(c_tmp.u, PARAM_N);
-    printf("\n\nv: "); for(int i = 0 ; i < CRYPTO_BYTES ; ++i) printf("%02x", c_tmp.v[i]);
-    printf("\n\nd: "); for(int i = 0 ; i < CRYPTO_BYTES ; ++i) printf("%02x", c_tmp.d[i]);
-    printf("\n\nss: "); for(int i = 0 ; i < SHARED_SECRET_BYTES ; ++i) printf("%02x", ss[i]);
-    printf("\n\nh = x^-1.y: "); ffi_vec_print(pk_tmp.h, PARAM_N);
-  #endif
-
   free(G_seedexpander);
   free(encSeedexpander);
 
@@ -182,10 +150,6 @@ int crypto_kem_enc(unsigned char* ct, unsigned char* ss, const unsigned char* pk
  * \return 0 if decapsulation is successfull
  */
 int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned char* sk) {
-  #ifdef VERBOSE
-    printf("\n\n\n\n### DECAPS ###\n");
-  #endif
-
   ffi_field_init();
   ffi_vec_init_mulmod();
 
@@ -199,9 +163,6 @@ int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned ch
   //Syndrom computation
   ffi_vec xc;
   ffi_vec_mul(xc, sk_tmp.x, c.u, PARAM_N);
-  #ifdef VERBOSE
-    printf("\n\nxc: "); ffi_vec_print(xc, PARAM_N);
-  #endif
 
   // Retrieve support_r by cyclic-support error decoding
   ffi_vec E;
@@ -217,10 +178,6 @@ int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned ch
   } else {
     memset(decryptedE, 0, sizeof(SHARED_SECRET_BYTES));
   }
-
-  #ifdef VERBOSE
-    printf("\n\nE: "); ffi_vec_print(E, E_dim);
-  #endif
 
   unsigned char m2[CRYPTO_BYTES];
 
@@ -264,12 +221,6 @@ int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned ch
 
   ffi_vec_echelonize(E2, PARAM_R);
 
-  #ifdef VERBOSE
-    printf("\n\nE': "); ffi_vec_print(E2, PARAM_R);
-    printf("\n\nE1': "); ffi_vec_print(polyE1, PARAM_N);
-    printf("\n\nE2': "); ffi_vec_print(polyE2, PARAM_N);
-  #endif
-
   unsigned char support[PARAM_R * GF2MBYTES], hashSupp[CRYPTO_BYTES];
   ffi_vec_to_string(support, E, PARAM_R);
   sha512(hashSupp, support, PARAM_R * GF2MBYTES);
@@ -279,14 +230,6 @@ int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned ch
   }
 
   sha512(c2.d, m2, CRYPTO_BYTES);
-
-  /************************************/
-
-  #ifdef VERBOSE
-    printf("\n\nu'(syndrom): "); ffi_vec_print(c2.u, PARAM_N);
-    printf("\n\nv': "); for(int i = 0 ; i < CRYPTO_BYTES ; ++i) printf("%02x", c2.v[i]);
-    printf("\n\nd': "); for(int i = 0 ; i < CRYPTO_BYTES ; ++i) printf("%02x", c2.d[i]);
-  #endif
 
   //d = d' ?
   if(memcmp(c.d, c2.d, SHA512_BYTES)) return 1;
@@ -303,10 +246,6 @@ int crypto_kem_dec(unsigned char* ss, const unsigned char* ct, const unsigned ch
   ffi_vec_to_string(mc + SHA512_BYTES, c.u, PARAM_N);
   memcpy(mc + SHA512_BYTES + PARAM_N * GF2MBYTES, c.v, SHA512_BYTES);
   sha512(ss, mc, CIPHERTEXT_BYTES);
-
-  #ifdef VERBOSE
-    printf("\n\nss: "); for(int i = 0 ; i < SHARED_SECRET_BYTES ; ++i) printf("%02x", ss[i]);
-  #endif
 
   free(G_seedexpander);
   free(encSeedexpander);

@@ -91,10 +91,6 @@ int RS_recover(ffi_vec& E, unsigned int E_expected_dim, const ffi_vec& F, unsign
   unsigned int S_dim = ffi_vec_gauss(S, xc_size);
   expand_space(S, S_dim, E_expected_dim, F, F_dim);
 
-  #ifdef VERBOSE
-    printf("\n\nS after expansion:"); ffi_vec_print(S, S_dim);
-  #endif
-
   // Compute the spaces Si = F[i]^(-1) * S
   ffi_vec Si[F_dim];
   ffi_elt Fi_inv;
